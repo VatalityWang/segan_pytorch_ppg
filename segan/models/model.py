@@ -30,6 +30,8 @@ from scipy.fftpack import fft
 import heartpy as hp
 import math
 from sklearn import preprocessing
+import warnings
+
 # from visualize import Visualizer
 
 
@@ -144,6 +146,7 @@ class SEGAN(Model):
                                     torch.zeros(pad).to(device)), dim=0)
             else:
                 #ipdb.set_trace()
+                warnings.simplefilter("ignore")
                 x[0, 0] = inwav[0, 0, beg_i:beg_i + length]
                 if isinstance(x[0,0],np.ndarray):
                     x[0,0]=preprocessing.scale(x[0,0])
@@ -188,7 +191,8 @@ class SEGAN(Model):
             slice_idx += 1
         # de-emph
         #ipdb.set_trace()
-        c_res = de_emphasize(c_res, self.preemph)
+        #c_res = de_emphasize(c_res, self.preemph)
+        c_res=hp.filtering.filter_signal(c_res,[0.1,5],sample_rate=125,order=3,filtertype='bandpass')
         #c_res = de_emphasize(c_res, 0.99)
         return c_res, g_c
 
